@@ -107,4 +107,4 @@ app.post("/login", function (req, res) {
 });
 
 // Listen for connections
-app.listen(process.env.API_PORT);
+app.listen(process.env.PORT || process.env.API_PORT);
