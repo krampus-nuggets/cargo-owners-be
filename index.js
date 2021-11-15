@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 const express = require("express");
-const bodyParser = require("body-parser")
-const session = require("express-session");
+const bodyParser = require("body-parser");
+const session = require("cookie-session");
 const auth = require("./src/utilities/auth");
 
 // Initialize
@@ -21,6 +21,7 @@ const users = {
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
+    name: "session",
     resave: false, // Don"t save session if unmodified
     saveUninitialized: false, // Don"t create session until something stored
     secret: process.env.EXPRESS_SECRET
@@ -78,9 +79,8 @@ app.get("/api", restrict, function (req, res) {
 
 // Terminate User Session
 app.get("/logout", function (req, res) {
-    req.session.destroy(function () {
-        res.redirect("/");
-    });
+    req.session = null;
+    res.redirect("/");
 });
 
 // GET - API Login Response
@@ -97,11 +97,9 @@ app.post("/login", function (req, res) {
 
     if (authenticate(requestData.username, requestData.password)) {
         // Regenerate session when signing in to prevent fixation
-        req.session.regenerate(function () {
-            req.session.user = requestData.username;
-            req.session.success = "SUCCESS: User Authenticated!";
-            res.redirect("/api");
-        });
+        req.session.user = requestData.username;
+        req.session.success = "SUCCESS: User Authenticated!";
+        res.redirect("/api");
     } else {
         req.session.error = "ERROR: Authentication Failed";
         res.redirect("/login");
@@ -109,4 +107,4 @@ app.post("/login", function (req, res) {
 });
 
 // Listen for connections
-app.listen(process.env.API_PORT);
+app.listen(process.env.PORT || process.env.API_PORT);
