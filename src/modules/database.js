@@ -47,3 +47,25 @@ async function queryAllRates(ID, rateType) {
         return Promise.resolve(documents);
     }
 }
+
+async function insertTransporter(documentObject) {
+    try {
+        await client.connect();
+
+        const database = client.db(process.env.DB_NAME);
+        const collection = database.collection(collections["transporter"]);
+        
+        await collection.insertOne(documentObject);
+    } catch (err) {
+        console.error();
+    } finally {
+        await client.close();
+    }
+}
+
+//queryAllRates(0, "transporter").then(function(res) { console.log(res) });
+
+module.exports = {
+    checkConnection,
+    queryAllRates
+}
