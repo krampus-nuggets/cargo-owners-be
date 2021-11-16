@@ -22,8 +22,9 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
     name: "session",
-    resave: false, // Don"t save session if unmodified
-    saveUninitialized: false, // Don"t create session until something stored
+    maxAge: 24 * 60 * 60 * 1000,
+    resave: false,
+    saveUninitialized: false,
     secret: process.env.EXPRESS_SECRET
 }));
 
