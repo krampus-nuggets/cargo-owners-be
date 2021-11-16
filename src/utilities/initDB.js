@@ -11,7 +11,7 @@ const MongoClient = require("mongodb").MongoClient;
 
 // Initial Project
 dotenv.config();
-const url = process.env.PROD_DB_URL
+const url = process.env.PROD_DB_URL || process.env.DB_URL
 const cwd = __dirname + "/"
 
 // Define Models Directory Object

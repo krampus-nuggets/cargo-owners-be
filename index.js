@@ -2,7 +2,9 @@ const dotenv = require("dotenv");
 const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("cookie-session");
+const asyncHandler = require('express-async-handler');
 const auth = require("./src/utilities/auth");
+const dbModule = require("./src/modules/database");
 
 // Initialize
 const app = express();
@@ -18,12 +20,14 @@ const users = {
 }
 
 // Apply Middleware
+app.set("trust proxy", 1),
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
     name: "session",
-    resave: false, // Don"t save session if unmodified
-    saveUninitialized: false, // Don"t create session until something stored
+    maxAge: 24 * 60 * 60 * 1000,
+    resave: false,
+    saveUninitialized: false,
     secret: process.env.EXPRESS_SECRET
 }));
 
@@ -41,6 +45,18 @@ app.use(function (req, res, next) {
     res.locals.message = "";
     if (err) res.locals.message = "<p class='msg error'>" + err + "</p>";
     if (msg) res.locals.message = "<p class='msg success'>" + msg + "</p>";
+    next();
+});
+
+
+// Apply CORS Headers
+app.use(function (req, res, next) {
+
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
     next();
 });
 
@@ -72,10 +88,46 @@ app.get("/", function (req, res) {
     res.send("Cargo-Owners API v1");
 });
 
-// Restricted - API Route
-app.get("/api", restrict, function (req, res) {
-    res.send("Wahoo! restricted area, click to <a href='/logout'>logout</a>");
+// Restricted - API Route | GET Response
+app.get("/api", restrict, async function (req, res) {
+    res.send("Login Successful | You can now access the API");
 });
+
+// Restricted - API Route | POST Request Handler
+app.post("/api", restrict, asyncHandler(async(req, res) => {
+    /*
+
+        queryString Object | Value Types
+        ================================
+
+        userID: int
+        rateType: str
+        actionType: str
+        mutationType: str
+
+        Query Request => ?userid=0&ratetype=transporter&actiontype=query
+
+    */
+
+    let queryString = {
+        userID: Number(req.query.userid),
+        rateType: req.query.ratetype || null,
+        actionType: req.query.actiontype || null,
+        mutationType: req.query.mutationtype || null
+    }
+
+    if (queryString.actionType === "query") {
+        const data = await dbModule.queryAllRates(queryString.userID, queryString.rateType).then(function(result){
+            return result
+        });
+
+        res.json(data);
+    } else if (queryString.actionType === "mutate") {
+        // pass
+    } else {
+        res.end();
+    }
+}));
 
 // Terminate User Session
 app.get("/logout", function (req, res) {
@@ -96,15 +148,14 @@ app.post("/login", function (req, res) {
     }
 
     if (authenticate(requestData.username, requestData.password)) {
-        // Regenerate session when signing in to prevent fixation
         req.session.user = requestData.username;
         req.session.success = "SUCCESS: User Authenticated!";
-        res.redirect("/api");
+        res.status(200).send("OK");
     } else {
         req.session.error = "ERROR: Authentication Failed";
         res.redirect("/login");
     }
 });
 
-// Listen for connections
+// Listen for connections | Ports vary between local and prod
 app.listen(process.env.PORT || process.env.API_PORT);
