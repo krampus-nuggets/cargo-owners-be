@@ -1,12 +1,12 @@
 [
-  {
-    "cob_name": "RFG",
-    "route_id": "RFG_ROUTE906",
-    "loading_place": "Western Cape - Wellington",
-    "destination": "North-West - Lichtenburg",
-    "load_type": "Part load",
-    "vehicle_type": "34 Ton - Tautliner (Superlink) Part load",
-    "latest_rate": 20000,
-    "trip_configuration": "One way"
-  }
+	{
+		"cob_name": "RFG",
+		"route_id": "RFG_ROUTE906",
+		"loading_place": "Western Cape - Wellington",
+		"destination": "North-West - Lichtenburg",
+		"load_type": "Part load",
+		"vehicle_type": "34 Ton - Tautliner (Superlink) Part load",
+		"latest_rate": 20000,
+		"trip_configuration": "One way"
+	}
 ]
