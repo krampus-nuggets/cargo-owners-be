@@ -10,7 +10,7 @@ const { MongoClient } = require("mongodb");
 
 // Initialize Application
 dotenv.config();
-const connectURI = process.env.DB_URL;
+const connectURI = process.env.DB_URL || process.env.PROD_DB_URL;
 const client = new MongoClient(connectURI);
 
 // Object for Collection Names
@@ -25,7 +25,7 @@ async function checkConnection() {
 
     try {
         await client.connect();
-        await client.db(process.env.DB_NAME).command({ ping: 1 });
+        await client.db(process.env.PROD_DB_NAME || process.env.DB_NAME).command({ ping: 1 });
         checkState = true;
     } catch (err) {
         console.error();
@@ -42,7 +42,7 @@ async function queryAllRates(ID, rateType) {
     try {
         await client.connect();
 
-        const database = client.db(process.env.DB_NAME);
+        const database = client.db(process.env.PROD_DB_NAME || process.env.DB_NAME);
         const collection = database.collection(collections[rateType]);
         const query = { userID: ID };
         const cursor = collection.find(query);
@@ -64,7 +64,7 @@ async function insertTransporter(documentObject) {
     try {
         await client.connect();
 
-        const database = client.db(process.env.DB_NAME);
+        const database = client.db(process.env.PROD_DB_NAME || process.env.DB_NAME);
         const collection = database.collection(collections["transporter"]);
         
         await collection.insertOne(documentObject);
