@@ -106,7 +106,7 @@ app.post("/api", restrict, asyncHandler(async(req, res) => {
     if (queryString.actionType === "query") {
         const data = await dbModule.queryAllRates(queryString.userID, queryString.rateType).then(function(result){
             return result
-});
+        });
 
         res.json(data);
     } else if (queryString.actionType === "mutate") {
@@ -135,7 +135,6 @@ app.post("/login", function (req, res) {
     }
 
     if (authenticate(requestData.username, requestData.password)) {
-        // Regenerate session when signing in to prevent fixation
         req.session.user = requestData.username;
         req.session.success = "SUCCESS: User Authenticated!";
         res.redirect("/api");
@@ -145,5 +144,5 @@ app.post("/login", function (req, res) {
     }
 });
 
-// Listen for connections
+// Listen for connections | Ports vary between local and prod
 app.listen(process.env.PORT || process.env.API_PORT);
