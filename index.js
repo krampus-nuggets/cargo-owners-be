@@ -75,10 +75,46 @@ app.get("/", function (req, res) {
     res.send("Cargo-Owners API v1");
 });
 
-// Restricted - API Route
-app.get("/api", restrict, function (req, res) {
-    res.send("Wahoo! restricted area, click to <a href='/logout'>logout</a>");
+// Restricted - API Route | GET Response
+app.get("/api", restrict, async function (req, res) {
+    res.send("Login Successful | You can now access the API");
 });
+
+// Restricted - API Route | POST Request Handler
+app.post("/api", restrict, asyncHandler(async(req, res) => {
+    /*
+
+        queryString Object | Value Types
+        ================================
+
+        userID: int
+        rateType: str
+        actionType: str
+        mutationType: str
+
+        Query Request => ?userid=0&ratetype=transporter&actiontype=query
+
+    */
+
+    let queryString = {
+        userID: Number(req.query.userid),
+        rateType: req.query.ratetype || null,
+        actionType: req.query.actiontype || null,
+        mutationType: req.query.mutationtype || null
+    }
+
+    if (queryString.actionType === "query") {
+        const data = await dbModule.queryAllRates(queryString.userID, queryString.rateType).then(function(result){
+            return result
+});
+
+        res.json(data);
+    } else if (queryString.actionType === "mutate") {
+        // pass
+    } else {
+        res.end();
+    }
+}));
 
 // Terminate User Session
 app.get("/logout", function (req, res) {
