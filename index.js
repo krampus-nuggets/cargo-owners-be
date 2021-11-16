@@ -21,7 +21,7 @@ const users = {
 
 // Apply Middleware
 app.set("trust proxy", 1),
-app.use(bodyParser.json());
+    app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
     name: "session",
@@ -51,8 +51,13 @@ app.use(function (req, res, next) {
 
 // Apply CORS Headers
 app.use(function (req, res, next) {
+    const allowedOrigins = ["http://localhost:8585", "https://cargo-owners-fe.netlify.app/"];
+    const origin = req.headers.origin;
 
-    res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    
     res.setHeader("Access-Control-Allow-Methods", "GET, POST");
     res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type");
     res.setHeader("Access-Control-Allow-Credentials", true);
@@ -94,7 +99,7 @@ app.get("/api", restrict, async function (req, res) {
 });
 
 // Restricted - API Route | POST Request Handler
-app.post("/api", restrict, asyncHandler(async(req, res) => {
+app.post("/api", restrict, asyncHandler(async (req, res) => {
     /*
 
         queryString Object | Value Types
@@ -117,7 +122,7 @@ app.post("/api", restrict, asyncHandler(async(req, res) => {
     }
 
     if (queryString.actionType === "query") {
-        const data = await dbModule.queryAllRates(queryString.userID, queryString.rateType).then(function(result){
+        const data = await dbModule.queryAllRates(queryString.userID, queryString.rateType).then(function (result) {
             return result
         });
 
