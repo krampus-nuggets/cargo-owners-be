@@ -20,6 +20,7 @@ const users = {
 }
 
 // Apply Middleware
+app.set("trust proxy", 1),
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
