@@ -150,7 +150,7 @@ app.post("/login", function (req, res) {
     if (authenticate(requestData.username, requestData.password)) {
         req.session.user = requestData.username;
         req.session.success = "SUCCESS: User Authenticated!";
-        res.redirect("/api");
+        res.status(200).send("OK");
     } else {
         req.session.error = "ERROR: Authentication Failed";
         res.redirect("/login");
