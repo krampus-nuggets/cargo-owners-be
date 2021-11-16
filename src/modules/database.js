@@ -1,15 +1,25 @@
+/*
+
+    Database Handler
+    Query and Mutate functionality is handled in this module.
+
+*/
+
 const dotenv = require("dotenv");
 const { MongoClient } = require("mongodb");
 
+// Initialize Application
 dotenv.config();
 const connectURI = process.env.DB_URL;
 const client = new MongoClient(connectURI);
 
+// Object for Collection Names
 const collections = {
     transporter: "transporter-rates",
     average: "average-rates"
 }
 
+// Check if application can connect to DB
 async function checkConnection() {
     let checkState = false;
 
@@ -25,6 +35,7 @@ async function checkConnection() {
     }
 }
 
+// QUERY - Get all rates from collection | Rates retrieved are in relation to UserID and Collection Name
 async function queryAllRates(ID, rateType) {
     let documents = [];
 
@@ -48,6 +59,7 @@ async function queryAllRates(ID, rateType) {
     }
 }
 
+// MUTATE - Insert document into Transporter Rates collection
 async function insertTransporter(documentObject) {
     try {
         await client.connect();
@@ -62,8 +74,6 @@ async function insertTransporter(documentObject) {
         await client.close();
     }
 }
-
-//queryAllRates(0, "transporter").then(function(res) { console.log(res) });
 
 module.exports = {
     checkConnection,
