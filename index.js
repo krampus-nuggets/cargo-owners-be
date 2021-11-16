@@ -2,7 +2,9 @@ const dotenv = require("dotenv");
 const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("cookie-session");
+const asyncHandler = require('express-async-handler');
 const auth = require("./src/utilities/auth");
+const dbModule = require("./src/modules/database");
 
 // Initialize
 const app = express();
