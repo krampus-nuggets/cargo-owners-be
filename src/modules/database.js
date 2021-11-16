@@ -24,3 +24,26 @@ async function checkConnection() {
         return checkState;
     }
 }
+
+async function queryAllRates(ID, rateType) {
+    let documents = [];
+
+    try {
+        await client.connect();
+
+        const database = client.db(process.env.DB_NAME);
+        const collection = database.collection(collections[rateType]);
+        const query = { userID: ID };
+        const cursor = collection.find(query);
+
+        await cursor.forEach(function (item) {
+            documents.push(item);
+        });
+    } catch (err) {
+        console.log("");
+        return Promise.reject(err);
+    } finally {
+        await client.close();
+        return Promise.resolve(documents);
+    }
+}
